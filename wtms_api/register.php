@@ -1,61 +1,23 @@
-<<<<<<< HEAD
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
-header("Content-Type: application/json");
+include 'db.php';
 
-include 'config.php';
+$name = isset($_POST['name']) ? $_POST['name'] : '';
+$email = isset($_POST['email']) ? $_POST['email'] : '';
+$password = isset($_POST['password']) ? sha1($_POST['password']) : '';
+$phone = isset($_POST['phone']) ? $_POST['phone'] : '';
+$address = isset($_POST['address']) ? $_POST['address'] : '';
 
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = sha1($_POST['password']);
-$phone = $_POST['phone'];
-$address = $_POST['address'];
-
-$response = [];
-
-$sql = "INSERT INTO users (name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("sssss", $name, $email, $password, $phone, $address);
-
-if ($stmt->execute()) {
-    $response['success'] = true;
-    $response['message'] = "Registration successful!";
-} else {
-    $response['success'] = false;
-    $response['message'] = "Error: " . $stmt->error;
+if (empty($name) || empty($email) || empty($password) || empty($phone) || empty($address)) {
+    echo json_encode(["success" => false, "message" => "All fields are required"]);
+    exit();
 }
 
-echo json_encode($response);
-?>
-=======
-<?php
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
-header("Content-Type: application/json");
+// Update your DB to include phone and address if not already
+$sql = "INSERT INTO users (name, email, password, phone, address) VALUES ('$name', '$email', '$password', '$phone', '$address')";
 
-include 'config.php';
-
-$name = $_POST['name'];
-$email = $_POST['email'];
-$password = sha1($_POST['password']);
-$phone = $_POST['phone'];
-$address = $_POST['address'];
-
-$response = [];
-
-$sql = "INSERT INTO users (name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("sssss", $name, $email, $password, $phone, $address);
-
-if ($stmt->execute()) {
-    $response['success'] = true;
-    $response['message'] = "Registration successful!";
+if ($conn->query($sql)) {
+    echo json_encode(["success" => true, "message" => "Registered successfully"]);
 } else {
-    $response['success'] = false;
-    $response['message'] = "Error: " . $stmt->error;
+    echo json_encode(["success" => false, "message" => $conn->error]);
 }
-
-echo json_encode($response);
 ?>
->>>>>>> 8c09b11f198c75afa0393fb462aad473cd62d512
